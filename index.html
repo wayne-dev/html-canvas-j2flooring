@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="http://cdn.rawgit.com/asvd/dragscroll/master/dragscroll.js"></script>
+</head>
+<body>
+    <script>
+        jQuery(document).ready(function($){
+            var _canvas = document.createElement('canvas');
+            _canvas.id     = "canvas";
+            var _width = _canvas.width = 3000;
+            var _height = _canvas.height = 2000;
+            var _temp_border, _temp_background = '';
+            var _scale = 0.1;
+            var _size = 50;
+            
+            function change_background(src, size, canvas){
+                var _image = new Image();
+                _image.src = src;
+                var _draw = canvas.getContext('2d');
+                _image.onload = function() {
+                    var _pattern = _draw.createPattern(_image, 'repeat');
+                    _draw.fillStyle = _pattern;
+                    _draw.fillRect(0, 0, _width, _height);
+                }
+                _temp_background = src;
+            }
+
+            function change_border(src, size, canvas){
+                var _image = new Image();
+                _image.src = src;
+                var _draw = canvas.getContext('2d');
+                _image.onload = function() {
+                    var _pattern = _draw.createPattern(_image, 'repeat');
+                    _draw.fillStyle = _pattern;
+                    //top
+                    /*_draw.beginPath();
+                    _draw.moveTo(0, 0);
+                    _draw.lineTo((_width/2), (_height/2));
+                    _draw.lineTo(_width, 0);
+                    _draw.fill();*/
+                    _draw.fillRect(0, 0, _width, size);
+                    //bottom
+                    /*_draw.beginPath();
+                    _draw.moveTo(0, _height);
+                    _draw.lineTo((_width/2), (_height/2));
+                    _draw.lineTo(_width, _height);
+                    _draw.fill();*/
+                    _draw.fillRect(0, _height-size, _width, size);
+                    //left
+                    /*_draw.beginPath();
+                    _draw.moveTo(0, 0);
+                    _draw.lineTo((_width/2), (_height/2));
+                    _draw.lineTo(0, _height);
+                    _draw.fill();*/
+                    _draw.fillRect(0, 0, size, _height);
+                    //right
+                    /*_draw.beginPath();
+                    _draw.moveTo((_width/2), (_height/2));
+                    _draw.lineTo(_width, 0);
+                    _draw.lineTo(_width, _height);
+                    _draw.fill();*/
+                    _draw.fillRect(_width-size, 0, size, _height);
+                }
+                _temp_border = src;
+            }
+
+            function add_canvas(){
+                $('#images_canvas').empty();
+                document.getElementById('images_canvas').appendChild(_canvas);
+                scale_img();
+            }
+
+            function scale_img(){
+                $('#images_canvas canvas').css({'height': _height*_scale+'px' , 'width': _width*_scale+'px'})
+            }
+
+            $('.canvas-background').click(function(){
+                var $src = $(this).attr('data-pattern');
+                change_background($src, _size, _canvas);
+                if(_temp_border){
+                    change_border(_temp_border, _size, _canvas);
+                }
+                add_canvas();
+            });
+            $('.canvas-border').click(function(){
+                var $src = $(this).attr('data-pattern');
+                if(_temp_background){
+                    change_background(_temp_background, _size, _canvas);
+                }
+                change_border($src, _size, _canvas);
+                add_canvas();
+            });
+            $('button.button-zoom').click(function(){
+                if($(this).hasClass('zoom-in')){
+                    _scale = parseFloat(_scale) + 0.01;
+                    if( _scale > 1){
+                        _scale = 1;
+                    }
+                }
+                
+                if($(this).hasClass('zoom-out')) {
+                    _scale = parseFloat(_scale) - 0.01;
+                    if( _scale < 0.1){
+                        _scale = 0.1;
+                    }
+                }
+                scale_img();
+            });
+        });
+    </script>
+    <style>
+        #images_canvas canvas{
+            margin: auto;
+        }
+    </style>
+    <a class="canvas-background" data-pattern="imgs/GPC20643480-150x150.jpg"><img src="imgs/GPC20643480-150x150.jpg" /></a>
+    <a class="canvas-background" data-pattern="imgs/GPC20643501-150x150.jpg"><img src="imgs/GPC20643501-150x150.jpg" /></a>
+    <a class="canvas-background" data-pattern="imgs/GPC20643528-150x150.jpg"><img src="imgs/GPC20643528-150x150.jpg" /></a>
+    <hr>
+    <a class="canvas-border" data-pattern="border/GPC20238437-150x150.jpg" ><img src="border/GPC20238437-150x150.jpg" /></a>
+    <a class="canvas-border" data-pattern="border/GPC20238445-150x150.jpg" ><img src="border/GPC20238445-150x150.jpg" /></a>
+    <a class="canvas-border" data-pattern="border/GPC20238453-150x150.jpg" ><img src="border/GPC20238453-150x150.jpg" /></a>
+    <hr>
+    <button class="button-zoom zoom-in">Zoom In</button>
+    <button class="button-zoom zoom-out">Zoom Out</button>
+
+    <div id="images_canvas" class="dragscroll" style="width: 600px; height: 400px; background: #777; overflow: scroll; position: relative; display: flex;">
+    </div>
+
+</body>
+</html>
